@@ -1,0 +1,344 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans, sans-serif); }
+.header { padding: 1.5rem 1.5rem 1rem; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.header h1 { font-size: 18px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 4px; }
+.header p { font-size: 13px; color: var(--color-text-secondary); }
+.filters { display: flex; gap: 8px; flex-wrap: wrap; padding: 1rem 1.5rem 0.75rem; }
+.pill { font-size: 12px; padding: 4px 12px; border-radius: 20px; cursor: pointer; border: 0.5px solid var(--color-border-secondary); background: transparent; color: var(--color-text-secondary); transition: all .15s; white-space: nowrap; }
+.pill.active { border-color: transparent; }
+.pill-all.active { background: var(--color-background-tertiary); color: var(--color-text-primary); border-color: var(--color-border-primary); }
+.pill-ops.active { background: #EEEDFE; color: #3C3489; border-color: #534AB7; }
+.pill-tech.active { background: #E1F5EE; color: #085041; border-color: #0F6E56; }
+.pill-culture.active { background: #E6F1FB; color: #0C447C; border-color: #185FA5; }
+.pill-events.active { background: #FAEEDA; color: #633806; border-color: #854F0B; }
+.pill-outreach.active { background: #FAECE7; color: #712B13; border-color: #993C1D; }
+@media (prefers-color-scheme: dark) {
+  .pill-ops.active { background: #3C3489; color: #CECBF6; border-color: #7F77DD; }
+  .pill-tech.active { background: #085041; color: #9FE1CB; border-color: #1D9E75; }
+  .pill-culture.active { background: #0C447C; color: #B5D4F4; border-color: #378ADD; }
+  .pill-events.active { background: #633806; color: #FAC775; border-color: #BA7517; }
+  .pill-outreach.active { background: #712B13; color: #F5C4B3; border-color: #D85A30; }
+}
+.cards { padding: 0.5rem 1.5rem 1.5rem; display: flex; flex-direction: column; gap: 12px; }
+.problem-card { border-radius: 12px; border: 0.5px solid var(--color-border-tertiary); overflow: hidden; transition: opacity .2s; }
+.problem-card.hidden { display: none; }
+.card-header { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px 12px; cursor: pointer; user-select: none; }
+.card-header:hover { background: var(--color-background-secondary); }
+.sev-badge { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 10px; white-space: nowrap; flex-shrink: 0; margin-top: 2px; }
+.sev-high { background: #FCEBEB; color: #791F1F; }
+.sev-mid  { background: #FAEEDA; color: #633806; }
+.sev-low  { background: #EAF3DE; color: #27500A; }
+@media (prefers-color-scheme: dark) {
+  .sev-high { background: #501313; color: #F7C1C1; }
+  .sev-mid  { background: #412402; color: #FAC775; }
+  .sev-low  { background: #173404; color: #C0DD97; }
+}
+.card-title-area { flex: 1; }
+.problem-num { font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 2px; }
+.problem-title { font-size: 14px; font-weight: 500; color: var(--color-text-primary); line-height: 1.4; }
+.problem-subtitle { font-size: 12px; color: var(--color-text-secondary); margin-top: 3px; line-height: 1.4; }
+.cat-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 6px; }
+.chevron { font-size: 12px; color: var(--color-text-tertiary); flex-shrink: 0; margin-top: 4px; transition: transform .2s; }
+.expanded .chevron { transform: rotate(90deg); }
+.card-body { display: none; border-top: 0.5px solid var(--color-border-tertiary); }
+.expanded .card-body { display: block; }
+.what-happened { padding: 12px 16px; background: var(--color-background-secondary); border-bottom: 0.5px solid var(--color-border-tertiary); }
+.what-happened label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: .05em; color: var(--color-text-tertiary); display: block; margin-bottom: 5px; }
+.what-happened p { font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; }
+.fixes { padding: 12px 16px; }
+.fixes label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: .05em; color: var(--color-text-tertiary); display: block; margin-bottom: 8px; }
+.fix-item { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 8px; }
+.fix-item:last-child { margin-bottom: 0; }
+.fix-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+.fix-text { font-size: 13px; color: var(--color-text-primary); line-height: 1.55; }
+.fix-tag { display: inline-block; font-size: 11px; padding: 1px 7px; border-radius: 8px; margin-left: 6px; vertical-align: middle; }
+.legend { display: flex; gap: 16px; flex-wrap: wrap; padding: 0 1.5rem 1rem; }
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--color-text-secondary); }
+.legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+.summary-bar { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; padding: 0 1.5rem 1rem; }
+.stat { background: var(--color-background-secondary); border-radius: 8px; padding: 10px 12px; }
+.stat-n { font-size: 20px; font-weight: 500; color: var(--color-text-primary); }
+.stat-l { font-size: 11px; color: var(--color-text-secondary); margin-top: 1px; }
+</style>
+
+<div class="header">
+  <h1>BnC presidency — problems & initiatives map</h1>
+  <p>15 structural problems from the current tenure, each mapped to its precise fix</p>
+</div>
+
+<div class="summary-bar">
+  <div class="stat"><div class="stat-n">15</div><div class="stat-l">Problems</div></div>
+  <div class="stat"><div class="stat-n" style="color:#E24B4A">6</div><div class="stat-l">Critical</div></div>
+  <div class="stat"><div class="stat-n" style="color:#BA7517">5</div><div class="stat-l">Moderate</div></div>
+  <div class="stat"><div class="stat-n" style="color:#639922">4</div><div class="stat-l">Low</div></div>
+  <div class="stat"><div class="stat-n">5</div><div class="stat-l">Domains</div></div>
+</div>
+
+<div class="filters">
+  <button class="pill pill-all active" onclick="filter('all', this)">All 15</button>
+  <button class="pill pill-ops" onclick="filter('ops', this)">Operations</button>
+  <button class="pill pill-tech" onclick="filter('tech', this)">Technology</button>
+  <button class="pill pill-culture" onclick="filter('culture', this)">Culture & prep</button>
+  <button class="pill pill-events" onclick="filter('events', this)">Events</button>
+  <button class="pill pill-outreach" onclick="filter('outreach', this)">Outreach</button>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#534AB7"></div>Operations</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#0F6E56"></div>Technology</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#185FA5"></div>Culture & prep</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#BA7517"></div>Events</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#993C1D"></div>Outreach</div>
+</div>
+
+<div class="cards" id="cards"></div>
+
+<script>
+const problems = [
+  {
+    id: 1, cat: 'ops', sev: 'high',
+    title: 'Bills not reimbursed on time',
+    sub: 'Financial admin treated as an afterthought',
+    what: 'Expense documentation was left until end of tenure — bills accumulated over months, submitted in one chaotic batch, causing delays and missing records.',
+    fixes: [
+      { text: 'Two dedicated coordinators own financial documentation from Day 1', tag: 'Ownership' },
+      { text: 'Every bill incurred in a month is submitted before month-end — no exceptions', tag: 'Deadline' },
+      { text: 'Shared expense tracker updated within 48 hours of any spend, reviewed at every bimonthly meeting', tag: 'Accountability' },
+    ]
+  },
+  {
+    id: 2, cat: 'ops', sev: 'high',
+    title: 'Internship season created a dead phase',
+    sub: '3rd year coordinators unavailable — club stalled entirely',
+    what: 'Club effectively went dark during summer internship season. Momentum built in Semester 1 dissipated. 2nd year executives had neither the ownership nor the onboarding to fill the gap.',
+    fixes: [
+      { text: 'Recruitment before internship season so execs and coordinators have joint working time before the gap', tag: 'Timing' },
+      { text: '"Intern-season programme" pre-planned: content, workshops, and LeetCase updates driven by 2nd year executives', tag: 'Plan' },
+      { text: 'President team works directly with executives on three defined fronts during this window', tag: 'Structure' },
+      { text: 'No phase of the tenure is written off — minimum one touchpoint per month guaranteed', tag: 'Floor' },
+    ]
+  },
+  {
+    id: 3, cat: 'ops', sev: 'mid',
+    title: 'No events calendar — uneven event distribution',
+    sub: '2–3 events clustered, then weeks of silence',
+    what: 'Events bunched together created external perception of inactivity and internal burnout cycles. No operating contract existed for the year.',
+    fixes: [
+      { text: 'Full-year calendar drafted before tenure begins, cross-referenced against academic and BRCA dates', tag: 'Day 0' },
+      { text: 'One student-facing touchpoint mandated every month — workshop, competition, session, or content drop', tag: 'Floor' },
+      { text: 'Heavy semesters get flagships; lighter months get workshops and community initiatives', tag: 'Balance' },
+      { text: 'Calendar changes allowed only with 2-week notice and core team sign-off — it is the operating contract', tag: 'Discipline' },
+    ]
+  },
+  {
+    id: 4, cat: 'ops', sev: 'mid',
+    title: 'Executives disconnected and underutilised',
+    sub: '2nd years lacked ownership, felt no real connection',
+    what: 'Executives did not see coordinators as authority figures and had no meaningful ownership. They were less effective support than expected and disengaged quickly.',
+    fixes: [
+      { text: 'Execs paired with coordinators on specific deliverables from Day 1 — not just vertical assignment', tag: 'Pairing' },
+      { text: 'Every exec owns a bounded task publicly: social media rollout, registration tracker, post-event recap', tag: 'Ownership' },
+      { text: 'Seniors and execs compete together in external case competitions — shared stakes build trust', tag: 'Culture' },
+      { text: 'Monthly "Exec × Cordi case prep" session; Fresher\'s Case Comp within 4 weeks of recruitment', tag: 'Integration' },
+    ]
+  },
+  {
+    id: 5, cat: 'ops', sev: 'high',
+    title: 'Poor recruitment led to early dropouts',
+    sub: 'Especially in design — enthusiasm over demonstrated skill',
+    what: 'Recruits selected on enthusiasm rather than capability found themselves unable to contribute meaningfully, leading to disengagement and early departure — particularly design executives.',
+    fixes: [
+      { text: 'Design roles: mandatory portfolio/task-based round — submit a sample post before selection', tag: 'Skill filter' },
+      { text: 'Realistic job preview during interview: actual workload, time commitment, consequences of inactivity', tag: 'Honesty' },
+      { text: '2-week probationary onboarding with a defined first task — early commitment visible', tag: 'Probation' },
+      { text: 'BDes coordinator hire is non-negotiable — gives inexperienced execs an expert to learn from', tag: 'Anchor' },
+    ]
+  },
+  {
+    id: 6, cat: 'ops', sev: 'low',
+    title: 'Inter-club collaboration fell apart',
+    sub: 'One meaningful collaboration collapsed mid-execution',
+    what: 'No significant inter-club projects materialised. The one collaboration that started fell apart with no shared scope, ownership, or exit conditions agreed.',
+    fixes: [
+      { text: 'Scope document required before any collaboration begins: contributions, deliverable, ownership, exit condition', tag: 'Process' },
+      { text: 'Partner only with clubs whose incentives naturally align — EDC, Eco Club, analytics clubs', tag: 'Alignment' },
+      { text: 'Miranda House Consultancy Forum and IIM/ISB clubs re-approached with defined joint event proposals', tag: 'Structure' },
+      { text: 'Alumni networks used to warm-introduce BnC to clubs at IIMs and ISB', tag: 'Warm intro' },
+    ]
+  },
+  {
+    id: 7, cat: 'ops', sev: 'low',
+    title: 'No judge or mentor network',
+    sub: 'Scrambling for judges last minute every time',
+    what: 'When competitions needed external judges, BnC had no standing network. Every event required a fresh cold search with no reliable pipeline.',
+    fixes: [
+      { text: 'Build BnC Judge & Mentor Network proactively — passout seniors, alumni, and project company contacts', tag: 'Database' },
+      { text: 'Network segmented by domain (consulting, finance, product, startups) for precise event matching', tag: 'Segmentation' },
+      { text: 'Touch the network twice a year with an update — not just when a favour is needed', tag: 'Maintenance' },
+      { text: 'Project Co-lead roles give 4th years a reason to stay engaged beyond one-off judge appearances', tag: 'Retention' },
+    ]
+  },
+  {
+    id: 8, cat: 'tech', sev: 'high',
+    title: 'Tech initiatives didn\'t materialise',
+    sub: 'Capable team, no coordinator — ambition without roadmap',
+    what: 'Technically capable executives had no coordinator to translate ambition into a roadmap, hold timelines, or interface with other verticals on what to build. Nothing shipped.',
+    fixes: [
+      { text: 'Dedicated Tech Coordinator hired — new formalised role with singular Month 1 mandate: get website MVP live', tag: 'New role' },
+      { text: 'Tech initiatives phased with hard deadlines written into the tenure calendar', tag: 'Sequencing' },
+      { text: 'Tech Coordinator attends all core team meetings — tech deliverables are never peripheral', tag: 'Visibility' },
+      { text: 'Executives assigned specific features to own, not just "help with" — ownership drives accountability', tag: 'Ownership' },
+    ]
+  },
+  {
+    id: 9, cat: 'tech', sev: 'mid',
+    title: 'Design vertical effectively non-functional',
+    sub: 'Inconsistent output, no design identity for BnC',
+    what: 'With a coordinator who couldn\'t deliver and executives lacking skills to compensate, design output was substandard and inconsistent. BnC\'s visual identity suffered noticeably.',
+    fixes: [
+      { text: 'BTech Design student as dedicated design coordinator — non-negotiable hire', tag: 'BDes hire' },
+      { text: 'Week 1–2 design sprint: all social templates, event creatives, sponsorship deck, newsletter layout produced upfront', tag: 'Sprint' },
+      { text: 'Design review process: no post or deck goes out without design coordinator sign-off', tag: 'Gate' },
+      { text: 'Templates remove single-point-of-failure dependency — execution manageable even for less experienced members', tag: 'Resilience' },
+    ]
+  },
+  {
+    id: 10, cat: 'culture', sev: 'high',
+    title: 'Case competition participation was low',
+    sub: 'Members didn\'t know about comps, had no teams, felt unready',
+    what: 'A psychological barrier ("I\'m not ready yet"), lack of awareness, and no team-matching mechanism combined to keep most members from participating in any external competition.',
+    fixes: [
+      { text: 'Live External Case Competition Calendar on BnC website, updated weekly by executives', tag: 'Calendar' },
+      { text: 'Every competition announced on WhatsApp broadcast with a "looking for team?" thread', tag: 'Matchmaking' },
+      { text: 'Coordinators personally connect executives with 3rd/4th years for the same competition — breaks "too junior" barrier', tag: 'Senior pairing' },
+      { text: 'Fresher\'s Case Competition within first 4 weeks — once completed, psychological barrier is gone', tag: 'Entry point' },
+    ]
+  },
+  {
+    id: 11, cat: 'culture', sev: 'mid',
+    title: 'Content dropped off mid-tenure',
+    sub: 'No calendar, no accountability — posts went out in bursts',
+    what: 'Without a maintained content calendar or assigned ownership, posts happened in clusters then stopped. No consistency, no accountability for missing deadlines.',
+    fixes: [
+      { text: 'Monthly content calendar with every post assigned to a person, with a deadline and format', tag: 'Calendar' },
+      { text: 'Floor: 2 posts + 1 story per week on Instagram; 1 LinkedIn post per week', tag: 'Floor' },
+      { text: 'Content batched — 2 weeks of posts produced in a single session, then scheduled', tag: 'Batching' },
+      { text: 'If a creator misses a deadline, the coordinator covers — no post is missed', tag: 'Coverage' },
+    ]
+  },
+  {
+    id: 12, cat: 'events', sev: 'high',
+    title: 'Elevate and major events got insufficient sponsorship',
+    sub: 'Outreach started too late — budgets already allocated',
+    what: 'By the time BnC was pitching sponsors in January, companies had already allocated discretionary event budgets. Starting late left limited room to raise meaningful sponsorships.',
+    fixes: [
+      { text: 'Sponsorship deck finalised by end of October; outreach begins in November — semester before the event', tag: 'Timing' },
+      { text: 'Tiered outreach: Tier 1 (MBB, Big 4) Oct, Tier 2 (mid-size firms, EdTech) Nov, Tier 3 (fallback) Dec', tag: 'Tiering' },
+      { text: 'Live CRM tracks every sponsor conversation: contact, touchpoint, stage, amount committed', tag: 'CRM' },
+      { text: 'For speakers: alumni outreach simultaneous — passouts at MBB/PE firms are fastest path to confirmed speaker', tag: 'Speakers' },
+    ]
+  },
+  {
+    id: 13, cat: 'events', sev: 'mid',
+    title: 'Low turnout at campus events — poor publicity',
+    sub: 'Students found out the day before, or not at all',
+    what: 'Events publicised too late, on too few channels, with no campus physical presence. BnC\'s reach was limited to its own social followers.',
+    fixes: [
+      { text: 'Standard timeline per event: announce 2 weeks prior, reminder 1 week, final push 48 hours before', tag: 'Timeline' },
+      { text: 'Coordinators post in hostel, department, and class WhatsApp groups — goes beyond BnC\'s own followers', tag: 'Reach' },
+      { text: 'Physical posters in academic blocks and hostel noticeboards for major events', tag: 'Physical' },
+      { text: 'BnC WhatsApp broadcast + email subscriber list so students can opt in and receive guaranteed reach', tag: 'Subscriber list' },
+    ]
+  },
+  {
+    id: 14, cat: 'events', sev: 'low',
+    title: 'Only one event at Tryst — low inter-fest presence',
+    sub: 'Minimal visibility at IITD\'s highest-footfall moment',
+    what: 'BnC had only one event at Tryst — limiting visibility at the event that brings the most campus traffic all year.',
+    fixes: [
+      { text: 'Tryst coordination begins in October: pitch 2–3 events (case comp, guesstimate, business strategy challenge)', tag: 'Multi-event pitch' },
+      { text: 'If one proposal rejected, BnC still has meaningful presence — proposals designed for fallback', tag: 'Redundancy' },
+      { text: 'Elevate timed not to conflict with Tryst — team not stretched across both', tag: 'Calendar' },
+      { text: 'Similar pitch process for Rendezvous in August; more fest events = more recruitment next year', tag: 'Compounding' },
+    ]
+  },
+  {
+    id: 15, cat: 'outreach', sev: 'high',
+    title: 'Startup vertical stagnant — leads didn\'t convert',
+    sub: 'Weak deck, late start, wrong target companies',
+    what: 'Leads existed but pitch deck was not sharp enough, outreach started too late, and target companies had low acceptance probability. No project converted from a cold lead.',
+    fixes: [
+      { text: 'Pitch deck and email templates refined in Week 1 — reviewed by Prof-in-Charge and senior alumni before mass outreach', tag: 'Quality bar' },
+      { text: 'Mailing begins Week 3: exhausting alumni networks, FITT contacts, and past project company connections first', tag: 'Warm first' },
+      { text: 'Primary targets: IITD-incubated startups and Delhi NCR companies — shorter sales cycle, higher conversion with IITD brand', tag: 'Target selection' },
+      { text: '4th year members pitch BnC to their internship companies', tag: 'Warm pitching' },
+      { text: 'Live project pipeline tracker visible to the whole startup vertical — no lead goes cold without follow-up', tag: 'Pipeline' },
+    ]
+  },
+];
+
+const catColors = {
+  ops:      { dot: '#534AB7', tag: '#EEEDFE', tagText: '#3C3489', fixDot: '#7F77DD' },
+  tech:     { dot: '#0F6E56', tag: '#E1F5EE', tagText: '#085041', fixDot: '#1D9E75' },
+  culture:  { dot: '#185FA5', tag: '#E6F1FB', tagText: '#0C447C', fixDot: '#378ADD' },
+  events:   { dot: '#BA7517', tag: '#FAEEDA', tagText: '#633806', fixDot: '#EF9F27' },
+  outreach: { dot: '#993C1D', tag: '#FAECE7', tagText: '#712B13', fixDot: '#D85A30' },
+};
+
+function render(data) {
+  const container = document.getElementById('cards');
+  container.innerHTML = '';
+  data.forEach((p) => {
+    const c = catColors[p.cat];
+    const sevClass = p.sev === 'high' ? 'sev-high' : p.sev === 'mid' ? 'sev-mid' : 'sev-low';
+    const sevLabel = p.sev === 'high' ? 'Critical' : p.sev === 'mid' ? 'Moderate' : 'Low impact';
+    const fixHtml = p.fixes.map(f =>
+      `<div class="fix-item">
+        <div class="fix-dot" style="background:${c.fixDot}"></div>
+        <div class="fix-text">${f.text}
+          <span class="fix-tag" style="background:${c.tag};color:${c.tagText}">${f.tag}</span>
+        </div>
+      </div>`
+    ).join('');
+    const card = document.createElement('div');
+    card.className = 'problem-card';
+    card.dataset.cat = p.cat;
+    card.innerHTML = `
+      <div class="card-header" onclick="toggle(this.parentElement)">
+        <div class="cat-dot" style="background:${c.dot}"></div>
+        <div class="card-title-area">
+          <div class="problem-num">Problem ${String(p.id).padStart(2,'0')}</div>
+          <div class="problem-title">${p.title}</div>
+          <div class="problem-subtitle">${p.sub}</div>
+        </div>
+        <span class="sev-badge ${sevClass}">${sevLabel}</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="card-body">
+        <div class="what-happened">
+          <label>What happened</label>
+          <p>${p.what}</p>
+        </div>
+        <div class="fixes">
+          <label>How we fix it</label>
+          ${fixHtml}
+        </div>
+      </div>`;
+    container.appendChild(card);
+  });
+}
+
+function toggle(card) { card.classList.toggle('expanded'); }
+
+function filter(cat, btn) {
+  document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.problem-card').forEach(card => {
+    card.classList.toggle('hidden', cat !== 'all' && card.dataset.cat !== cat);
+  });
+}
+
+render(problems);
+</script>
